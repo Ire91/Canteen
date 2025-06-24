@@ -1,49 +1,33 @@
-# 📌 Union Bank Canteen Backend
+# 🍽️ Union Bank Canteen Backend
 
-A RESTful API built with Spring Boot to manage staff meal ordering, favorites, and priority account access.
+Spring Boot RESTful API that allows Union Bank staff to log in, order meals, mark favorites, and enjoy account-based privileges (e.g., CEO priority access).
 
 ---
 
 ## 🚀 Features
 
-- Staff login and authentication (JWT)
-- Meal ordering system
+- JWT-based user authentication
+- Staff meal ordering
 - Favorites management
-- Account-based access priority (e.g., CEO, CISO)
-- RESTful endpoints with error handling
-- CI/CD integration
+- Role-based access (e.g., CEO, CISO)
+- RESTful architecture
 
 ---
 
-## 📂 Project Structure
-/src
-/main
-/java/com/unioncanteen
-controller/
-service/
-model/
-repository/
-/resources
-application.properties
-/test
-README.md
-pom.xml
+## 📂 Tech Stack
 
-
+- Java 17
+- Spring Boot
+- Spring Security
+- Maven
+- H2 (or MySQL, update accordingly)
+- GitHub Actions
 
 ---
 
-## 🧰 Tech Stack
+## 🛠️ Getting Started
 
-- Java 17  
-- Spring Boot  
-- Spring Security  
-- Maven  
-- H2 / MySQL *(pick the one you use)*  
-- Postman (for testing)  
-- GitHub Actions (CI/CD)
-
----
-
-
-
+1. Clone the repo:
+```bash
+git clone https://github.com/Ire91/Canteen.git
+cd Canteen
