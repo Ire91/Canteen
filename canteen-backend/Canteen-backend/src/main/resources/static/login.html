@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Union Bank Canteen Staff Portal - Secure login for Union Bank employees">
+    <meta name="author" content="Union Bank IT Department">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Union Bank Canteen - Staff Portal</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="images/LOGO.jpeg" type="image/x-icon">
+    <style>
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            font-size: 1.2rem;
+            display: none;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .login-container {
+            position: relative;
+        }
+        #loginError {
+            color: #e74c3c;
+            margin-bottom: 1rem;
+            text-align: center;
+            display: none;
+        }
+        #errorMessage {
+            color: #e74c3c;
+            margin-bottom: 1rem;
+            text-align: center;
+            display: none;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body onload="checkAuth()">
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <div>Loading...</div>
+    </div>
+
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="themeToggle" title="Switch theme" aria-label="Switch theme">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <div class="login-container">
+        <div class="login-logo">
+            <img src="images/LOGO.jpeg" alt="Union Bank Logo">
+            <h2>Union Bank Canteen</h2>
+            <p class="subtitle">Staff Access Only</p>
+            <div class="staff-notice">This portal is exclusively for Union Bank staff members.</div>
+        </div>
+
+        <div class="login-security-badge">
+            <i class="fas fa-shield-alt"></i>
+            <span>Secure Staff Login</span>
+        </div>
+
+        <div id="errorMessage"></div>
+        <form id="loginForm" class="login-form">
+            <div class="form-group">
+                <label for="username"><i class="fas fa-user"></i> Staff ID / Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter your staff ID" autocomplete="username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password"><i class="fas fa-lock"></i> Password</label>
+                <div class="password-field">
+                    <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+                    <button type="button" class="toggle-password" id="togglePassword" aria-label="Toggle password visibility">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group remember-me">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="rememberMe" name="rememberMe">
+                    <span class="checkmark"></span>
+                    Remember me on this device
+                </label>
+            </div>
+
+            <div class="login-buttons">
+                <button type="submit" class="btn-login" id="loginButton">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+                <button type="button" id="cancelButton" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+
+            <div id="statusMessage" class="status-message"></div>
+        </form>
+        
+        <div class="login-footer">
+            <p><i class="fas fa-info-circle"></i> If you're having trouble logging in, please contact IT Support at ext. 4357 (HELP)</p>
+            <p class="copyright">&copy; 2025 Union Bank Nigeria. All rights reserved.</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Check if user is already logged in
+        function checkAuth() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const themeToggle = document.getElementById('themeToggle');
+            
+            try {
+                // Check if user is already authenticated
+                const user = sessionStorage.getItem('user') || localStorage.getItem('user');
+                
+                if (user) {
+                    // If logged in, redirect to index.html
+                    window.location.href = 'index.html';
+                } else {
+                    // If not logged in, show the login form
+                    loadingOverlay.style.display = 'none';
+                    themeToggle.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                loadingOverlay.style.display = 'none';
+                themeToggle.style.display = 'block';
+            }
+        }
+
+        console.log(document.querySelectorAll('#errorMessage'));
+    </script>
+    <script src="login.js" defer></script>
+</body>
+</html>

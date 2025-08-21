@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Feedback - Union Bank Canteen</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="images/LOGO.jpeg" type="image/x-icon">
+    <style>
+        .feedback-section {
+            padding: 80px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 200px);
+        }
+        .feedback-container {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        .feedback-container h2 {
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        .feedback-container p {
+            margin-bottom: 30px;
+            color: var(--text-secondary);
+        }
+        .feedback-form .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .feedback-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .feedback-form .star-rating {
+            display: flex;
+            justify-content: center;
+            flex-direction: row-reverse;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .star-rating input { display: none; }
+        .star-rating label {
+            color: #ccc;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #ffc107;
+        }
+        .feedback-form textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            min-height: 120px;
+            resize: vertical;
+        }
+        .feedback-form .btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="images/LOGO.jpeg" alt="Union Bank Logo">
+                <h1>Union Bank Canteen</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html#menu">Meals</a></li>
+                    <li><a href="my-orders.html">Order History</a></li>
+                    <li>
+                        <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+                    </li>
+                    <li class="user-info-nav">
+                        <a href="#" class="user-profile" id="userProfileLink">
+                            <i class="fas fa-user-circle"></i>
+                            <span id="userNameDisplay">User</span>
+                        </a>
+                        <div class="user-dropdown" id="userDropdown">
+                             <div class="user-details">
+                                <div class="user-name" id="userFullName">User Name</div>
+                                <div class="user-role" id="userRole">Role</div>
+                                <div class="user-department" id="userDepartment">Department</div>
+                            </div>
+                            <div class="user-dropdown-links">
+                                <a href="profile.html" class="dropdown-link"><i class="fas fa-user-cog"></i> My Profile</a>
+                                <a href="my-orders.html" class="dropdown-link"><i class="fas fa-receipt"></i> My Orders</a>
+                                <a href="admin.html" class="dropdown-link admin-link" id="adminDashboardLink" style="display: none;"><i class="fas fa-tachometer-alt"></i> Admin Dashboard</a>
+                            </div>
+                            <a href="#" id="logoutButton" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Feedback Section -->
+    <section class="feedback-section">
+        <div class="feedback-container">
+            <h2>We Value Your Feedback!</h2>
+            <p>Tell us about your meal. Your feedback helps us improve our service.</p>
+            <form id="feedbackForm" class="feedback-form">
+                <div class="form-group">
+                    <label>How would you rate your meal?</label>
+                    <div class="star-rating">
+                        <input type="radio" id="star5" name="rating" value="5" required/><label for="star5" title="5 stars">★</label>
+                        <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars">★</label>
+                        <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars">★</label>
+                        <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars">★</label>
+                        <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star">★</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="comments">Any comments or suggestions?</label>
+                    <textarea id="comments" name="comments" placeholder="e.g., The Jollof rice was fantastic!"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Feedback</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+       <!-- Same footer as other pages -->
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTheme();
+            displayUserInfo();
+
+            const feedbackForm = document.getElementById('feedbackForm');
+            feedbackForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const rating = document.querySelector('input[name="rating"]:checked');
+                if (!rating) {
+                    alert('Please select a star rating.');
+                    return;
+                }
+
+                const feedbackData = {
+                    rating: parseInt(rating.value),
+                    comments: document.getElementById('comments').value
+                };
+
+                let token = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
+                if (!token) {
+                    alert('You must be logged in to submit feedback.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/feedback', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify(feedbackData)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to submit feedback.');
+                    }
+
+                    alert('Thank you for your feedback!');
+                    feedbackForm.reset();
+                    window.location.href = 'index.html';
+
+                } catch (error) {
+                    console.error('Error submitting feedback:', error);
+                    alert('There was a problem submitting your feedback. Please try again.');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Union Bank Canteen - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="images/LOGO.jpeg" type="image/x-icon">
+    <script>
+        // Show loading overlay and check authentication
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            checkAuthStatus().then(isAuthenticated => {
+                if (!isAuthenticated) {
+                    window.location.href = 'login.html';
+                } else {
+                    if (loadingOverlay) loadingOverlay.style.display = 'none';
+                }
+            }).catch(() => {
+                window.location.href = 'login.html';
+            });
+        });
+        async function checkAuthStatus() {
+            const user = sessionStorage.getItem('user') || localStorage.getItem('user');
+            if (!user) return false;
+                return true;
+        }
+    </script>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <div>Loading...</div>
+    </div>
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="images/LOGO.jpeg" alt="Union Bank Logo">
+                <h1>Union Bank Canteen</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#menu" class="active">Meals</a></li>
+                    <li><a href="my-orders.html">Order History</a></li>
+                    <li>
+                        <button class="theme-toggle" id="themeToggle">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
+                    <li class="user-info-nav">
+                        <a href="#" class="user-profile" id="userProfileLink">
+                            <i class="fas fa-user-circle"></i>
+                            <span id="userNameDisplay">User</span>
+                        </a>
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="user-details">
+                                <div class="user-name" id="userFullName">User Name</div>
+                                <div class="user-role" id="userRole">Role</div>
+                                <div class="user-department" id="userDepartment">Department</div>
+                            </div>
+                            <div class="user-dropdown-links">
+                                <a href="profile.html" class="dropdown-link">
+                                    <i class="fas fa-user-cog"></i> My Profile
+                                </a>
+                                <a href="my-orders.html" class="dropdown-link">
+                                    <i class="fas fa-receipt"></i> My Orders
+                                </a>
+                                <a href="admin.html" class="dropdown-link admin-link" id="adminDashboardLink" style="display: none;">
+                                    <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                                </a>
+                            </div>
+                            <a href="#" id="logoutButton" class="logout-btn">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+                <div class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+    <!-- Meals/Menu Section -->
+    <section id="menu" class="menu-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Our Menu</h2>
+                <p>Delicious meals for Union Bank staff</p>
+            </div>
+            <!-- Quick Order Section -->
+            <div class="quick-order-section" id="quickOrderSection">
+                <div class="quick-order-header">
+                    <h3><i class="fas fa-bolt"></i> Quick Order</h3>
+                    <p>Your frequently ordered items</p>
+                </div>
+                <div class="quick-order-items" id="quickOrderItems">
+                    <div class="empty-quick-order" id="emptyQuickOrder">
+                        <i class="fas fa-utensils"></i>
+                        <p>Your frequently ordered items will appear here</p>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-categories">
+                <button class="category-btn active" data-category="all">All</button>
+                <button class="category-btn" data-category="breakfast">Breakfast</button>
+                <button class="category-btn" data-category="lunch">Lunch</button>
+                <button class="category-btn" data-category="dinner">Dinner</button>
+                <button class="category-btn" data-category="snacks">Snacks</button>
+            </div>
+            <div class="menu-items">
+                <!-- Menu items will be loaded dynamically via JavaScript -->
+            </div>
+        </div>
+    </section>
+    <!-- Cart Preview -->
+    <div class="cart-preview" id="cartPreview">
+        <div class="cart-header">
+            <h3>Your Cart</h3>
+            <button class="close-cart" id="closeCart"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <!-- Cart items will be added dynamically -->
+        </div>
+        <div class="cart-total">
+            <p>Total: <span id="cartTotal">₦0.00</span></p>
+        </div>
+        <div class="cart-buttons">
+            <button class="btn btn-secondary" id="clearCart">Clear Cart</button>
+            <button class="btn btn-primary" id="checkoutBtn">Checkout</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Union Bank Canteen</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            font-size: 1.5rem;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <script>
+        // Show loading overlay
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            
+            // Check authentication status
+            checkAuthStatus().then(isAuthenticated => {
+                if (!isAuthenticated) {
+                    window.location.href = 'login.html';
+                } else {
+                    // Hide loading overlay when content is ready
+                    if (loadingOverlay) {
+                        loadingOverlay.style.display = 'none';
+                    }
+                }
+            }).catch(error => {
+                console.error('Authentication check failed:', error);
+                window.location.href = 'login.html';
+            });
+        });
+
+        async function checkAuthStatus() {
+            const user = sessionStorage.getItem('user') || localStorage.getItem('user');
+            if (!user) return false;
+            
+            try {
+                // You can add an API call here to validate the token with the backend
+                return true;
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                return false;
+            }
+        }
+    </script>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <div>Loading...</div>
+    </div>
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="../images/LOGO.jpeg" alt="Union Bank Logo">
+                <h1>Union Bank Canteen</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#home" class="active">Home</a></li>
+                    <li><a href="#menu">Menu</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li class="notification-icon">
+                        <a href="#" id="notificationLink">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="notificationBadge">2</span>
+                        </a>
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="notification-header">
+                                <h3>Notifications</h3>
+                                <a href="#" class="mark-all-read">Mark all as read</a>
+                            </div>
+                            <div class="notification-list">
+                                <div class="notification-item unread">
+                                    <div class="notification-icon order-status">
+                                        <i class="fas fa-utensils"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">Order #1234 is ready</div>
+                                        <div class="notification-text">Your lunch order is ready for pickup</div>
+                                        <div class="notification-time">10 minutes ago</div>
+                                    </div>
+                                </div>
+                                <div class="notification-item unread">
+                                    <div class="notification-icon special-offer">
+                                        <i class="fas fa-gift"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">Today's Special Offer</div>
+                                        <div class="notification-text">Get 15% off on all desserts today!</div>
+                                        <div class="notification-time">1 hour ago</div>
+                                    </div>
+                                </div>
+                                <div class="notification-item">
+                                    <div class="notification-icon order-status">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">Order Confirmed</div>
+                                        <div class="notification-text">Your order #1233 has been confirmed</div>
+                                        <div class="notification-time">Yesterday</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="notification-footer">
+                                <a href="my-orders.html">View all notifications</a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="user-info-nav">
+                        <a href="#" class="user-profile" id="userProfileLink">
+                            <i class="fas fa-user-circle"></i>
+                            <span id="userNameDisplay">User</span>
+                        </a>
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="user-details">
+                                <div class="user-name" id="userFullName">User Name</div>
+                                <div class="user-role" id="userRole">Role</div>
+                                <div class="user-department" id="userDepartment">Department</div>
+                            </div>
+                            <div class="user-dropdown-links">
+                                <a href="profile.html" class="dropdown-link">
+                                    <i class="fas fa-user-cog"></i> My Profile
+                                </a>
+                                <a href="my-orders.html" class="dropdown-link">
+                                    <i class="fas fa-receipt"></i> My Orders
+                                </a>
+                                <a href="admin.html" class="dropdown-link admin-link" id="adminDashboardLink" style="display: none;">
+                                    <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                                </a>
+                            </div>
+                            <a href="#" id="logoutButton" class="logout-btn">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+                <div class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Welcome to Union Bank Canteen</h1>
+                <p>Serving delicious meals to Union Bank staff and visitors since 2010</p>
+                <div class="hero-buttons">
+                    <a href="#menu" class="btn btn-primary">View Menu</a>
+                    <a href="#about" class="btn btn-secondary">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="../images/LOGO.jpeg" alt="Canteen Food">
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Menu Section -->
+    <section id="menu" class="menu-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Our Menu</h2>
+                <p>Delicious meals for Union Bank staff</p>
+            </div>
+            
+            <!-- Quick Order Section -->
+            <div class="quick-order-section" id="quickOrderSection">
+                <div class="quick-order-header">
+                    <h3><i class="fas fa-bolt"></i> Quick Order</h3>
+                    <p>Your frequently ordered items</p>
+                </div>
+                <div class="quick-order-items" id="quickOrderItems">
+                    <!-- Quick order items will be loaded here dynamically -->
+                    <div class="empty-quick-order" id="emptyQuickOrder">
+                        <i class="fas fa-utensils"></i>
+                        <p>Your frequently ordered items will appear here</p>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-categories">
+                <button class="category-btn active" data-category="all">All</button>
+                <button class="category-btn" data-category="breakfast">Breakfast</button>
+                <button class="category-btn" data-category="lunch">Lunch</button>
+                <button class="category-btn" data-category="dinner">Dinner</button>
+                <button class="category-btn" data-category="snacks">Snacks</button>
+            </div>
+            <!-- MENU GRID SECTION: Menu items will be rendered here by script.js -->
+            <div class="menu-items">
+                <!-- Menu items will be loaded dynamically via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>About Our Canteen</h2>
+                <p>Serving the Union Bank community with quality food</p>
+            </div>
+            <div class="about-content">
+                <div class="about-image">
+                    <img src="../images/LOGO.jpeg" alt="Canteen Staff">
+                </div>
+                <div class="about-text">
+                    <h3>Our Story</h3>
+                    <p>The Union Bank Canteen has been serving delicious, nutritious meals to staff and visitors since 2010. Our mission is to provide quality food in a comfortable environment.</p>
+                    
+                    <h3>Our Values</h3>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> Quality ingredients</li>
+                        <li><i class="fas fa-check-circle"></i> Excellent service</li>
+                        <li><i class="fas fa-check-circle"></i> Clean environment</li>
+                        <li><i class="fas fa-check-circle"></i> Affordable prices</li>
+                    </ul>
+                    
+                    <h3>Opening Hours</h3>
+                    <div class="opening-hours">
+                        <div class="day">Monday - Friday</div>
+                        <div class="hours">7:30 AM - 4:30 PM</div>
+                    </div>
+                    <div class="opening-hours">
+                        <div class="day">Saturday</div>
+                        <div class="hours">8:00 AM - 2:00 PM</div>
+                    </div>
+                    <div class="opening-hours">
+                        <div class="day">Sunday</div>
+                        <div class="hours">Closed</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Contact Us</h2>
+                <p>Have questions or special requests? Get in touch with us</p>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h3>Location</h3>
+                            <p>Union Bank Headquarters, Marina, Lagos</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h3>Phone</h3>
+                            <p>+234 801 234 5678</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h3>Email</h3>
+                            <p>canteen@unionbank.com</p>
+                        </div>
+                    </div>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <form id="contactForm" action="process_contact.php" method="POST">
+                        <div class="form-group">
+                            <label for="name">Your Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Your Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" name="subject" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="../images/LOGO.jpeg" alt="Union Bank Logo">
+                    <h3>Union Bank Canteen</h3>
+                    <p>Serving delicious meals since 2010</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#menu">Menu</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="login.html">Login</a></li>
+                    </ul>
+                </div>
+                <div class="footer-services">
+                    <h3>Our Services</h3>
+                    <ul>
+                        <li><a href="#menu">Breakfast</a></li>
+                        <li><a href="#menu">Lunch</a></li>
+                        <li><a href="#menu">Dinner</a></li>
+                        <li><a href="#contact">Catering</a></li>
+                    </ul>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>Subscribe to Our Newsletter</h3>
+                    <p>Get updates on our latest specials and events</p>
+                    <form id="newsletterForm" action="subscribe.php" method="POST">
+                        <div class="newsletter-input">
+                            <input type="email" placeholder="Your email address" required>
+                            <button type="submit"><i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="currentYear"></span> Union Bank Canteen. All rights reserved.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Preview -->
+    <div class="cart-preview" id="cartPreview">
+        <div class="cart-header">
+            <h3>Your Cart</h3>
+            <button class="close-cart" id="closeCart"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <!-- Cart items will be added dynamically -->
+        </div>
+        <div class="cart-total">
+            <p>Total: <span id="cartTotal">₦0.00</span></p>
+        </div>
+        <div class="cart-buttons">
+            <button class="btn btn-secondary" id="clearCart">Clear Cart</button>
+            <button class="btn btn-primary" id="checkoutBtn">Checkout</button>
+        </div>
+    </div>
+
+    <!-- Loading Spinner Overlay for Checkout -->
+    <div id="checkoutLoadingOverlay" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+        <div style="background:white;padding:32px 40px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.15);display:flex;flex-direction:column;align-items:center;">
+            <div class="spinner" style="width:48px;height:48px;border:6px solid #f3f3f3;border-top:6px solid #009FE3;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:16px;"></div>
+            <div style="font-size:1.1rem;color:#333;">Loading checkout...</div>
+        </div>
+    </div>
+    <style>@keyframes spin {0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}</style>
+
+    <!-- Scripts -->
+    <script src="js/script.js"></script>
+</body>
+</html>

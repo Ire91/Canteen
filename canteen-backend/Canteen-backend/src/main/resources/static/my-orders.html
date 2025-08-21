@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Union Bank Canteen Staff Portal - Order History">
+    <meta name="author" content="Union Bank IT Department">
+    <title>My Orders - Union Bank Canteen</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="images/LOGO.jpeg" type="image/x-icon">
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!isLoggedIn()) {
+                window.location.href = 'login.html';
+            }
+        });
+        
+        function isLoggedIn() {
+            return sessionStorage.getItem('user') !== null;
+        }
+    </script>
+    <style>
+        .orders-section {
+            padding: 80px 0;
+            min-height: calc(100vh - 200px);
+        }
+        
+        .order-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+        
+        .order-tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            position: relative;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+        
+        .order-tab.active {
+            color: var(--primary-color);
+        }
+        
+        .order-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+        
+        .order-tab .count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            margin-left: 5px;
+        }
+        
+        .order-list {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .order-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 3px 10px var(--shadow-color);
+            overflow: hidden;
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: rgba(0, 159, 227, 0.08);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .order-id {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .order-date {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .order-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+        
+        .status-processing {
+            background-color: rgba(0, 123, 255, 0.2);
+            color: #007bff;
+        }
+        
+        .status-completed {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+        
+        .status-cancelled {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+        
+        .order-body {
+            padding: 20px;
+        }
+        
+        .order-items {
+            margin-bottom: 20px;
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-name {
+            display: flex;
+            align-items: center;
+        }
+        
+        .item-quantity {
+            background-color: var(--primary-color);
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 0.8rem;
+        }
+        
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background-color: var(--action-bg);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .order-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .order-actions button {
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .no-orders {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 3px 10px var(--shadow-color);
+        }
+        
+        .no-orders i {
+            font-size: 3rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        .no-orders h3 {
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+        
+        .no-orders p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="images/LOGO.jpeg" alt="Union Bank Logo">
+                <h1>Union Bank Canteen</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html#menu" class="active">Meals</a></li>
+                    <li><a href="my-orders.html">Order History</a></li>
+                    <li>
+                        <button class="theme-toggle" id="themeToggle">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
+                    <li class="user-info-nav">
+                        <a href="#" class="user-profile" id="userProfileLink">
+                            <i class="fas fa-user-circle"></i>
+                            <span id="userNameDisplay">User</span>
+                        </a>
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="user-details">
+                                <div class="user-name" id="userFullName">User Name</div>
+                                <div class="user-role" id="userRole">Role</div>
+                                <div class="user-department" id="userDepartment">Department</div>
+                            </div>
+                            <div class="user-dropdown-links">
+                                <a href="profile.html" class="dropdown-link">
+                                    <i class="fas fa-user-cog"></i> My Profile
+                                </a>
+                                <a href="my-orders.html" class="dropdown-link">
+                                    <i class="fas fa-receipt"></i> My Orders
+                                </a>
+                                <a href="admin.html" class="dropdown-link admin-link" id="adminDashboardLink" style="display: none;">
+                                    <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                                </a>
+                            </div>
+                            <a href="#" id="logoutButton" class="logout-btn">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+                <div class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Orders Section -->
+    <section class="orders-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>My Orders</h2>
+                <p>View and manage your canteen orders</p>
+            </div>
+            
+            <div class="order-tabs">
+                <div class="order-tab active" data-tab="all">All Orders</div>
+                <div class="order-tab" data-tab="pending">Pending <span class="count">2</span></div>
+                <div class="order-tab" data-tab="processing">Processing <span class="count">1</span></div>
+                <div class="order-tab" data-tab="completed">Completed</div>
+                <div class="order-tab" data-tab="cancelled">Cancelled</div>
+            </div>
+            
+            <div style="text-align:right;margin-bottom:20px;">
+                <button id="clearOrderHistoryBtn" class="btn btn-secondary" style="display: none;"><i class="fas fa-trash"></i> Clear Order History</button>
+            </div>
+            
+            <div class="order-list" id="orderList">
+                <!-- Orders will be loaded here dynamically -->
+            </div>
+            
+            <!-- Empty state (hidden by default) -->
+            <div class="no-orders" id="noOrders" style="display: none;">
+                <i class="fas fa-receipt"></i>
+                <h3>No Orders Found</h3>
+                <p>You haven't placed any orders yet.</p>
+                <a href="index.html#menu" class="btn btn-primary">Browse Menu</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="images/LOGO.jpeg" alt="Union Bank Logo">
+                    <h3>Union Bank Canteen</h3>
+                    <p>Serving delicious meals since 2010</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#menu">Menu</a></li>
+                        <li><a href="index.html#about">About</a></li>
+                        <li><a href="index.html#contact">Contact</a></li>
+                        <li><a href="my-orders.html">My Orders</a></li>
+                    </ul>
+                </div>
+                <div class="footer-services">
+                    <h3>Our Services</h3>
+                    <ul>
+                        <li><a href="index.html#menu">Breakfast</a></li>
+                        <li><a href="index.html#menu">Lunch</a></li>
+                        <li><a href="index.html#menu">Dinner</a></li>
+                        <li><a href="index.html#contact">Catering</a></li>
+                    </ul>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>Subscribe to Our Newsletter</h3>
+                    <p>Get updates on our latest specials and events</p>
+                    <form id="newsletterForm" action="subscribe.php" method="POST">
+                        <div class="newsletter-input">
+                            <input type="email" placeholder="Your email address" required>
+                            <button type="submit"><i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="currentYear"></span> Union Bank Canteen. All rights reserved.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize theme and user info
+            initializeTheme();
+            displayUserInfo();
+            
+            const orderList = document.getElementById('orderList');
+            const noOrders = document.getElementById('noOrders');
+            const clearOrderHistoryBtn = document.getElementById('clearOrderHistoryBtn');
+            const orderTabsContainer = document.querySelector('.order-tabs');
+            let allOrders = []; // Cache all orders to avoid re-fetching
+
+            // --- Fetch and Render Order History ---
+            async function fetchOrderHistory() {
+                let token = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
+                if (!token) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/orders', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch order history');
+                    }
+
+                    allOrders = await response.json();
+                    renderOrders(allOrders);
+                    updateTabCounts();
+
+                } catch (error) {
+                    console.error('Error fetching order history:', error);
+                    orderList.innerHTML = ''; // Clear any existing content
+                    noOrders.style.display = 'block';
+                    clearOrderHistoryBtn.style.display = 'none';
+                }
+            }
+
+            // --- Render Orders ---
+            function renderOrders(ordersToRender) {
+                orderList.innerHTML = ''; // Clear static content or previous renders
+                if (ordersToRender.length === 0) {
+                    noOrders.style.display = 'block';
+                    // Hide clear history button if there are no orders in the current view, but not if there are orders in other tabs
+                    clearOrderHistoryBtn.style.display = allOrders.length > 0 ? 'inline-block' : 'none';
+                } else {
+                    noOrders.style.display = 'none';
+                    clearOrderHistoryBtn.style.display = 'inline-block';
+                    ordersToRender.forEach(order => {
+                        const orderCard = createOrderCard(order);
+                        orderList.appendChild(orderCard);
+                    });
+                }
+            }
+            
+             // --- Update Tab Counts ---
+            function updateTabCounts() {
+                const statusCounts = { pending: 0, processing: 0, completed: 0, cancelled: 0 };
+                allOrders.forEach(order => {
+                    const status = order.status.toLowerCase();
+                    if (status in statusCounts) {
+                        statusCounts[status]++;
+                    }
+                });
+
+                for (const status in statusCounts) {
+                    const countEl = orderTabsContainer.querySelector(`[data-tab="${status}"] .count`);
+                    if (countEl) {
+                        countEl.textContent = statusCounts[status];
+                        countEl.style.display = statusCounts[status] > 0 ? 'inline-flex' : 'none';
+                    }
+                }
+            }
+
+            // --- Tab Filtering Logic ---
+            orderTabsContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('order-tab')) {
+                    const selectedTab = e.target;
+                    const status = selectedTab.dataset.tab;
+
+                    // Update active tab
+                    orderTabsContainer.querySelector('.active').classList.remove('active');
+                    selectedTab.classList.add('active');
+
+                    // Filter and render orders
+                    if (status === 'all') {
+                        renderOrders(allOrders);
+                    } else {
+                        const filteredOrders = allOrders.filter(order => order.status.toLowerCase() === status);
+                        renderOrders(filteredOrders);
+                    }
+                }
+            });
+
+            // --- Create a single order card ---
+            function createOrderCard(order) {
+                const card = document.createElement('div');
+                card.className = 'order-card';
+                card.setAttribute('data-status', order.status.toLowerCase());
+
+                const orderDate = new Date(order.orderDate).toLocaleString('en-US', {
+                    year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+
+                let itemsHtml = order.items.map(item => `
+                    <div class="order-item">
+                        <div class="item-name">
+                            <div class="item-quantity">${item.quantity}</div>
+                            <div>${item.mealName}</div>
+                        </div>
+                        <div class="item-price">₦${(item.price * item.quantity).toLocaleString()}</div>
+                    </div>
+                `).join('');
+
+                card.innerHTML = `
+                    <div class="order-header">
+                        <div class="order-id">Order #${order.id}</div>
+                        <div class="order-date">${orderDate}</div>
+                        <div class="order-status status-${order.status.toLowerCase()}">${order.status}</div>
+                    </div>
+                    <div class="order-body">
+                        <div class="order-items">${itemsHtml}</div>
+                        <div class="order-total">
+                            <div>Total</div>
+                            <div>₦${order.totalAmount.toLocaleString()}</div>
+                        </div>
+                    </div>
+                    <div class="order-footer">
+                        <div class="order-actions">
+                            <button class="btn btn-primary reorder-btn" data-order-items='${JSON.stringify(order.items)}'><i class="fas fa-redo"></i> Reorder</button>
+                            <button class="btn btn-danger delete-order-btn" data-order-id="${order.id}"><i class="fas fa-trash"></i> Delete</button>
+                        </div>
+                    </div>
+                `;
+
+                card.querySelector('.delete-order-btn').addEventListener('click', handleDeleteOrder);
+
+                return card;
+            }
+
+            // --- Delete Single Order ---
+            async function handleDeleteOrder(event) {
+                const button = event.currentTarget;
+                const orderId = button.dataset.orderId;
+                const orderCard = button.closest('.order-card');
+
+                if (confirm(`Are you sure you want to delete Order #${orderId}? This action cannot be undone.`)) {
+                    let token = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
+                    try {
+                        const response = await fetch(`/api/orders/${orderId}`, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': 'Bearer ' + token }
+                        });
+
+                        if (response.ok) {
+                            alert(`Order #${orderId} has been deleted.`);
+                            // Remove from cache and re-render
+                            allOrders = allOrders.filter(o => o.id != orderId);
+                            const activeTab = orderTabsContainer.querySelector('.active').dataset.tab;
+                            const ordersToRender = activeTab === 'all' ? allOrders : allOrders.filter(o => o.status.toLowerCase() === activeTab);
+                            renderOrders(ordersToRender);
+                            updateTabCounts();
+                        } else {
+                             const errorText = await response.text();
+                             throw new Error(`Failed to delete order. Status: ${response.status}. Message: ${errorText}`);
+                        }
+                    } catch (error) {
+                        console.error('Error deleting order:', error);
+                        alert('Could not delete the order. Please try again.');
+                    }
+                }
+            }
+
+            // --- Reorder Logic ---
+            orderList.addEventListener('click', function(event) {
+                if (event.target.closest('.reorder-btn')) {
+                    const button = event.target.closest('.reorder-btn');
+                    const items = JSON.parse(button.dataset.orderItems);
+                    
+                    if (items && items.length > 0) {
+                        let cart = getCartItems();
+                        items.forEach(item => {
+                            // We need to map order item details to cart item details
+                            // This assumes a 'getMenuItemById' function exists or we have access to the full menu
+                            // For now, let's just add what we have. A robust solution might need a menu lookup.
+                            const cartItem = {
+                                id: item.mealId,
+                                name: item.mealName,
+                                price: item.price,
+                                quantity: item.quantity
+                            };
+                            
+                            // Check if item already in cart, if so, update quantity
+                            const existingCartItem = cart.find(ci => ci.id === cartItem.id);
+                            if (existingCartItem) {
+                                existingCartItem.quantity += cartItem.quantity;
+                    } else {
+                                cart.push(cartItem);
+                            }
+                        });
+                        saveCartItems(cart);
+                        alert('Items from your previous order have been added to your cart!');
+                        window.location.href = 'index.html#menu'; // Redirect to see the cart
+                    }
+                }
+            });
+
+            // --- Utility functions for cart (should be consistent with script.js) ---
+            function getCartItems() {
+                return JSON.parse(localStorage.getItem('cart')) || [];
+            }
+
+            function saveCartItems(cart) {
+                localStorage.setItem('cart', JSON.stringify(cart));
+            }
+
+
+            // --- Clear Order History ---
+            if (clearOrderHistoryBtn) {
+                clearOrderHistoryBtn.addEventListener('click', async function() {
+                    if (confirm('Are you sure you want to permanently delete your entire order history?')) {
+                        let token = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
+                        try {
+                            const response = await fetch('/api/orders', {
+                                method: 'DELETE',
+                                headers: { 'Authorization': 'Bearer ' + token }
+                            });
+
+                            if (!response.ok) {
+                                throw new Error('Failed to clear history');
+                            }
+                            
+                            // Refresh the order list and counts
+                            await fetchOrderHistory();
+                            alert('Order history cleared successfully.');
+
+                        } catch (error) {
+                            console.error('Error clearing history:', error);
+                            alert('Could not clear order history. Please try again.');
+                        }
+                    }
+                });
+            }
+
+            // Initial fetch
+            fetchOrderHistory();
+        });
+    </script>
+</body>
+</html>

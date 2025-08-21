@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Union Bank Canteen Admin Dashboard">
+    <meta name="author" content="Union Bank IT Department">
+    <title>Admin Dashboard - Union Bank Canteen</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="images/LOGO.jpeg" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Check if user is logged in and is admin
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!isLoggedIn()) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            if (!isAdmin()) {
+                alert('You do not have permission to access the admin dashboard.');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // If we get here, user is logged in and is admin
+            console.log('Admin authenticated successfully');
+        });
+        
+        function isLoggedIn() {
+            return sessionStorage.getItem('user') !== null;
+        }
+        
+        function isAdmin() {
+            try {
+                const user = JSON.parse(sessionStorage.getItem('user'));
+                return user && Array.isArray(user.roles) && user.roles.some(r => r.toLowerCase() === 'admin');
+            } catch (error) {
+                return false;
+            }
+        }
+    </script>
+</head>
+<body class="admin-body">
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h2>Admin Panel</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active" data-tab="dashboard">
+                        <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    </li>
+                    <li data-tab="menu-management">
+                        <a href="#"><i class="fas fa-utensils"></i> Menu Management</a>
+                    </li>
+                    <li data-tab="order-management">
+                        <a href="#"><i class="fas fa-clipboard-list"></i> Order Management</a>
+                    </li>
+                    <li data-tab="reports">
+                        <a href="#"><i class="fas fa-chart-bar"></i> Reports</a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="index.html" class="back-to-site">
+                    <i class="fas fa-arrow-left"></i> Back to Site
+                </a>
+                <a href="#" id="adminLogoutBtn" class="admin-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <div class="admin-header-title">
+                    <h1 id="pageTitle">Dashboard</h1>
+                </div>
+                <div class="admin-header-user">
+                    <button class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <span id="headerAdminName">Admin User</span>
+                    <div class="admin-avatar" id="headerAdminAvatar"><span>A</span></div>
+                </div>
+            </header>
+            
+            <!-- Dashboard Tab -->
+            <section class="admin-content active" id="dashboard">
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-receipt"></i></div>
+                        <div class="stat-info">
+                            <p>Total Orders</p>
+                            <h3 id="totalOrders">--</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                        <div class="stat-info">
+                            <p>Total Revenue</p>
+                            <h3 id="totalRevenue">--</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <p>Total Users</p>
+                            <h3 id="totalUsers">--</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-section">
+                    <div class="table-container recent-orders">
+                        <h3>Recent Orders</h3>
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>User</th>
+                                    <th>Date</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentOrdersTableBody">
+                                <!-- JS will populate this -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-container top-selling">
+                        <h3>Top Selling Items</h3>
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th>Quantity Sold</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topSellingTableBody">
+                                <!-- JS will populate this -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Menu Management Tab -->
+            <section class="admin-content" id="menu-management">
+                <div class="content-header">
+                    <h2>Menu Management</h2>
+                    <button class="primary-btn" id="addMenuItemBtn">
+                        <i class="fas fa-plus"></i> Add New Item
+                    </button>
+                </div>
+                
+                <div class="menu-categories-filter">
+                    <button class="category-filter active" data-category="all">All Categories</button>
+                    <button class="category-filter" data-category="main">Main Dishes</button>
+                    <button class="category-filter" data-category="sides">Side Dishes</button>
+                    <button class="category-filter" data-category="drinks">Drinks</button>
+                    <button class="category-filter" data-category="desserts">Desserts</button>
+                </div>
+                
+                <div class="menu-items-grid" id="menuItemsGrid">
+                    <!-- Menu items will be loaded here dynamically as cards -->
+                </div>
+            </section>
+            
+            <!-- Order Management Tab -->
+            <section class="admin-content" id="order-management">
+                <div class="content-header">
+                    <h2>Order Management</h2>
+                    <div class="order-filters">
+                        <select id="orderStatusFilter" class="filter-select">
+                            <option value="all">All Statuses</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Processing">Processing</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                        <button class="secondary-btn" id="refreshOrdersBtn">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="orders-grid" id="ordersGrid">
+                    <!-- Orders will be loaded here dynamically as cards -->
+                </div>
+                 <div class="no-orders" id="noOrdersMessage" style="display: none; text-align: center; padding: 40px;">
+                    <i class="fas fa-inbox" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 15px;"></i>
+                    <h3>No orders found for this filter.</h3>
+                </div>
+            </section>
+            
+            <!-- Reports Tab -->
+            <section class="admin-content" id="reports">
+                <div class="report-grid">
+                    <div class="report-main">
+                        <div class="chart-container">
+                            <h3>Revenue by Day (Last 7 Days)</h3>
+                            <canvas id="revenueByDayChart"></canvas>
+                        </div>
+                        <div class="table-container">
+                            <h3>Sales by Day (Last 7 Days)</h3>
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Total Sales</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="salesByDayTable"></tbody>
+                            </table>
+                        </div>
+                        <div class="table-container">
+                            <h3>Sales by Category</h3>
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Total Sales</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="salesByCategoryTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="report-sidebar">
+                        <div class="chart-container">
+                            <h3>Top 5 Selling Items (by Quantity)</h3>
+                            <canvas id="topItemsChart"></canvas>
+                        </div>
+                        <div class="table-container">
+                            <h3>Top 5 User Activity</h3>
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Number of Orders</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="userActivityTable"></tbody>
+                            </table>
+                        </div>
+                        <div class="table-container">
+                            <h3>Top Selling Items</h3>
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Item Name</th>
+                                        <th>Quantity Sold</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reportTopSellingTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Add Menu Item Modal -->
+    <div class="modal" id="addMenuItemModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Menu Item</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addMenuItemForm">
+                    <div class="form-group">
+                        <label for="itemName">Item Name</label>
+                        <input type="text" id="itemName" name="itemName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemCategory">Category</label>
+                        <select id="itemCategory" name="itemCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="main">Main Dish</option>
+                            <option value="sides">Side Dish</option>
+                            <option value="drinks">Drink</option>
+                            <option value="desserts">Dessert</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemPrice">Price (₦)</label>
+                        <input type="number" id="itemPrice" name="itemPrice" min="0" step="50" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemDescription">Description</label>
+                        <textarea id="itemDescription" name="itemDescription" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemImage">Image URL</label>
+                        <input type="text" id="itemImage" name="itemImage" placeholder="Enter image URL or upload">
+                        <div class="upload-btn-wrapper">
+                            <button class="upload-btn">Upload Image</button>
+                            <input type="file" id="imageUpload" accept="image/*">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="itemAvailable" name="itemAvailable" checked>
+                            <span class="checkbox-custom"></span>
+                            Available for ordering
+                        </label>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="secondary-btn cancel-modal">Cancel</button>
+                        <button type="submit" class="primary-btn">Add Item</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- View/Edit Order Modal -->
+    <div class="modal" id="orderModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Order Details</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="order-details">
+                    <div class="order-info">
+                        <div class="order-info-group">
+                            <span class="info-label">Order ID:</span>
+                            <span class="info-value" id="orderIdDisplay">#ORD-2025-1234</span>
+                        </div>
+                        <div class="order-info-group">
+                            <span class="info-label">Date & Time:</span>
+                            <span class="info-value" id="orderDateDisplay">May 22, 2025, 10:30 AM</span>
+                        </div>
+                        <div class="order-info-group">
+                            <span class="info-label">Customer:</span>
+                            <span class="info-value" id="orderCustomerDisplay">John Doe</span>
+                        </div>
+                        <div class="order-info-group">
+                            <span class="info-label">Department:</span>
+                            <span class="info-value" id="orderDepartmentDisplay">Finance</span>
+                        </div>
+                        <div class="order-info-group">
+                            <span class="info-label">Status:</span>
+                            <select id="orderStatusSelect" class="status-select">
+                                <option value="pending">Pending</option>
+                                <option value="processing">Processing</option>
+                                <option value="ready">Ready for Pickup</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="order-items">
+                        <h3>Order Items</h3>
+                        <div class="table-container">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orderItemsTableBody">
+                                    <!-- Order items will be loaded here dynamically -->
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" class="text-right"><strong>Total:</strong></td>
+                                        <td id="orderTotalDisplay">₦3,500</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="order-notes">
+                        <h3>Notes</h3>
+                        <textarea id="orderNotes" rows="3" placeholder="Add notes about this order..."></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="danger-btn" id="cancelOrderBtn">Cancel Order</button>
+                        <button type="button" class="primary-btn" id="updateOrderBtn">Update Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="admin.js"></script>
+    <script src="script.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // --- Theme Toggle ---
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+
+        // Function to apply theme
+        const applyTheme = (theme) => {
+            body.classList.remove('light-theme', 'dark-theme');
+            body.classList.add(theme);
+            themeToggle.innerHTML = theme === 'dark-theme' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        };
+
+        // Check for saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light-theme';
+        applyTheme(savedTheme);
+
+        // Toggle theme on button click
+        themeToggle.addEventListener('click', () => {
+            const newTheme = body.classList.contains('light-theme') ? 'dark-theme' : 'light-theme';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        });
+        
+        // --- Tab Switching Logic ---
+        const sidebarLinks = document.querySelectorAll('.sidebar-nav li');
+        const contentSections = document.querySelectorAll('.admin-content');
+        const pageTitle = document.getElementById('pageTitle');
+        
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tabId = link.dataset.tab;
+
+                sidebarLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                
+                pageTitle.textContent = link.textContent.trim();
+
+                contentSections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.id === tabId) {
+                        section.classList.add('active');
+                    }
+                });
+
+                if (tabId === 'dashboard') { // MODIFIED: Call fetchDashboardStats on initial load
+                    // No action needed for static dashboard
+                } else if (tabId === 'order-management') {
+                    fetchAndDisplayOrders();
+                } else if (tabId === 'menu-management') {
+                    fetchAndDisplayMenu();
+                } else if (tabId === 'reports') {
+                    fetchReportDetails();
+                }
+            });
+        });
+
+        // --- Chart Rendering ---
+        let revenueByDayChartInstance;
+        function renderRevenueByDayChart(data) {
+            const ctx = document.getElementById('revenueByDayChart').getContext('2d');
+            if (revenueByDayChartInstance) {
+                revenueByDayChartInstance.destroy();
+            }
+            revenueByDayChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(item => new Date(item.date).toLocaleDateString()).reverse(),
+                    datasets: [{
+                        label: 'Total Revenue',
+                        data: data.map(item => item.total).reverse(),
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: true,
+                        tension: 0.1
+                    }]
+                }
+            });
+        }
+
+        let topItemsChartInstance;
+        function renderTopItemsChart(data) {
+            const ctx = document.getElementById('topItemsChart').getContext('2d');
+            if (topItemsChartInstance) {
+                topItemsChartInstance.destroy();
+            }
+            topItemsChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(item => item.mealName),
+                    datasets: [{
+                        label: 'Quantity Sold',
+                        data: data.map(item => item.totalQuantity),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(153, 102, 255, 0.7)'
+                        ]
+                    }]
+                }
+            });
+        }
+
+        async function fetchReportDetails() {
+            const token = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
+            if (!token) return;
+
+            try {
+                const response = await fetch('/api/admin/dashboard/reports', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Failed to fetch report details');
+                const report = await response.json();
+
+                renderRevenueByDayChart(report.salesByDay);
+                renderTopItemsChart(report.topSellingItems);
+                
+                const salesByDayTable = document.getElementById('salesByDayTable');
+                salesByDayTable.innerHTML = '';
+                report.salesByDay.forEach(item => {
+                    salesByDayTable.innerHTML += `<tr><td>${new Date(item.date).toLocaleDateString()}</td><td>₦${item.total.toLocaleString()}</td></tr>`;
+                });
+
+                const salesByCategoryTable = document.getElementById('salesByCategoryTable');
+                salesByCategoryTable.innerHTML = '';
+                report.salesByCategory.forEach(item => {
+                    salesByCategoryTable.innerHTML += `<tr><td>${item.category}</td><td>₦${item.total.toLocaleString()}</td></tr>`;
+                });
+                
+                const userActivityTable = document.getElementById('userActivityTable');
+                userActivityTable.innerHTML = '';
+                report.userActivity.forEach(item => {
+                    userActivityTable.innerHTML += `<tr><td>${item.username}</td><td>${item.orders}</td></tr>`;
+                });
+
+                const reportTopSellingTable = document.getElementById('reportTopSellingTable');
+                reportTopSellingTable.innerHTML = '';
+                report.topSellingItems.forEach(item => {
+                    reportTopSellingTable.innerHTML += `<tr><td>${item.mealName}</td><td>${item.totalQuantity}</td></tr>`;
+                });
+
+            } catch (error) {
+                console.error('Error fetching report details:', error);
+            }
+        }
+
+        // --- Order Management ---
+        const ordersGrid = document.getElementById('ordersGrid');
+        const statusFilter = document.getElementById('orderStatusFilter');
+        const refreshBtn = document.getElementById('refreshOrdersBtn');
+        const noOrdersMessage = document.getElementById('noOrdersMessage');
+
+        let allOrders = [];
+
+        async function fetchAndDisplayOrders() {
+            let token = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
+            try {
+                const response = await fetch('/api/orders/admin/all', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!response.ok) throw new Error('Failed to fetch orders');
+                allOrders = await response.json();
+                filterAndRenderOrders();
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+                ordersGrid.innerHTML = '<p>Error loading orders. Please try again.</p>';
+            }
+        }
+
+        function filterAndRenderOrders() {
+            const filterValue = statusFilter.value;
+            const filteredOrders = filterValue === 'all' 
+                ? allOrders 
+                : allOrders.filter(order => order.status === filterValue);
+            
+            renderOrders(filteredOrders);
+        }
+
+        function renderOrders(orders) {
+            ordersGrid.innerHTML = '';
+            if (orders.length === 0) {
+                noOrdersMessage.style.display = 'block';
+                return;
+            }
+            noOrdersMessage.style.display = 'none';
+
+            orders.forEach(order => {
+                const orderCard = createOrderCard(order);
+                ordersGrid.appendChild(orderCard);
+            });
+        }
+            
+        function createOrderCard(order) {
+            const card = document.createElement('div');
+            card.className = 'order-card-admin';
+            card.dataset.orderId = order.id;
+
+            const itemsHtml = order.items.map(item => `
+                <li class="order-item-admin">
+                    <span>${item.quantity} x ${item.mealName}</span>
+                    <span>₦${(item.price * item.quantity).toLocaleString()}</span>
+                </li>
+            `).join('');
+
+            const statusOptions = ['Pending', 'Processing', 'Completed', 'Cancelled']
+                .map(s => `<option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>`)
+                .join('');
+            
+            card.innerHTML = `
+                <div class="order-card-header-admin">
+                    <h4>Order #${order.id}</h4>
+                    <span class="order-card-date">${new Date(order.orderDate).toLocaleString()}</span>
+                </div>
+                <div class="order-card-body-admin">
+                    <p><strong>User:</strong> ${order.username}</p>
+                    <ul class="order-items-list-admin">${itemsHtml}</ul>
+                    <p class="order-total-admin"><strong>Total:</strong> ₦${order.totalAmount.toLocaleString()}</p>
+                </div>
+                <div class="order-card-footer-admin">
+                    <label for="status-select-${order.id}">Status:</label>
+                    <select id="status-select-${order.id}" class="status-select">
+                        ${statusOptions}
+                    </select>
+                </div>
+            `;
+
+            const statusSelect = card.querySelector('.status-select');
+            statusSelect.addEventListener('change', (e) => updateOrderStatus(order.id, e.target.value));
+
+            return card;
+        }
+
+        async function updateOrderStatus(orderId, newStatus) {
+            let token = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
+            try {
+                const response = await fetch(`/api/orders/admin/${orderId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'text/plain'
+                    },
+                    body: newStatus
+                });
+                if (!response.ok) throw new Error('Failed to update status');
+
+                const orderToUpdate = allOrders.find(o => o.id === orderId);
+                if(orderToUpdate) orderToUpdate.status = newStatus;
+                filterAndRenderOrders();
+                
+                alert(`Order #${orderId} status updated to ${newStatus}.`);
+
+            } catch (error) {
+                console.error('Error updating status:', error);
+                alert('Failed to update order status. Please try again.');
+            }
+        }
+
+        // --- Menu Management ---
+        const menuItemsGrid = document.getElementById('menuItemsGrid');
+        const addMenuItemBtn = document.getElementById('addMenuItemBtn');
+        const menuItemModal = document.getElementById('addMenuItemModal');
+        const menuItemForm = document.getElementById('addMenuItemForm');
+        const categoryFilters = document.querySelectorAll('.menu-categories-filter .category-filter');
+        let allMenuItems = [];
+        let editingMealId = null;
+
+        async function fetchAndDisplayMenu() {
+            try {
+                const response = await fetch('/api/menu');
+                if (!response.ok) throw new Error('Could not fetch menu items');
+                allMenuItems = await response.json();
+                filterAndRenderMenu();
+            } catch (error) {
+                console.error('Error fetching menu:', error);
+                menuItemsGrid.innerHTML = '<p>Error loading menu. Please try again.</p>';
+            }
+        }
+
+        function filterAndRenderMenu() {
+            const activeFilter = document.querySelector('.menu-categories-filter .category-filter.active').dataset.category;
+            const filteredItems = activeFilter === 'all'
+                ? allMenuItems
+                : allMenuItems.filter(item => item.category.toLowerCase() === activeFilter.toLowerCase());
+            renderMenuItems(filteredItems);
+        }
+            
+        function renderMenuItems(items) {
+            menuItemsGrid.innerHTML = '';
+            items.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'menu-item-card-admin';
+                itemCard.innerHTML = `
+                    <img src="${item.imageUrl || 'images/default-meal.png'}" alt="${item.name}">
+                    <div class="menu-item-info">
+                        <h4>${item.name}</h4>
+                        <p class="menu-item-category">${item.category}</p>
+                        <p class="menu-item-price">₦${item.price.toLocaleString()}</p>
+                        <span class="availability-tag ${item.available ? 'available' : 'unavailable'}">
+                            ${item.available ? 'Available' : 'Unavailable'}
+                        </span>
+                    </div>
+                    <div class="menu-item-actions">
+                        <button class="btn-icon edit-btn"><i class="fas fa-edit"></i></button>
+                        <button class="btn-icon delete-btn"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                itemCard.querySelector('.edit-btn').addEventListener('click', () => openEditModal(item));
+                itemCard.querySelector('.delete-btn').addEventListener('click', () => deleteMenuItem(item.id));
+                menuItemsGrid.appendChild(itemCard);
+            });
+        }
+            
+        function openEditModal(item) {
+            editingMealId = item.id;
+            menuItemForm.reset();
+            menuItemForm.querySelector('#itemName').value = item.name;
+            menuItemForm.querySelector('#itemCategory').value = item.category;
+            menuItemForm.querySelector('#itemPrice').value = item.price;
+            menuItemForm.querySelector('#itemDescription').value = item.description;
+            menuItemForm.querySelector('#itemImage').value = item.imageUrl;
+            menuItemForm.querySelector('#itemAvailable').checked = item.available;
+            menuItemModal.querySelector('h2').textContent = 'Edit Menu Item';
+            menuItemModal.querySelector('button[type="submit"]').textContent = 'Save Changes';
+            menuItemModal.style.display = 'flex';
+        }
+
+        async function deleteMenuItem(id) {
+            if (!confirm('Are you sure you want to delete this menu item?')) return;
+            let token = sessionStorage.getItem('accessToken');
+            try {
+                const response = await fetch(`/api/menu/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token }});
+                if (!response.ok) throw new Error('Failed to delete item.');
+                await fetchAndDisplayMenu();
+            } catch (error) {
+                console.error('Error deleting menu item:', error);
+                alert('Could not delete item.');
+            }
+        }
+            
+        // --- NEW: Dashboard Stats Function ---
+        async function fetchDashboardStats() {
+            const token = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
+            if (!token) {
+                console.error('No auth token found');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/dashboard/stats', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch dashboard stats: ${response.statusText}`);
+                }
+
+                const stats = await response.json();
+
+                // Populate stat cards
+                document.getElementById('totalOrders').textContent = stats.totalOrders;
+                document.getElementById('totalRevenue').textContent = `₦${stats.totalRevenue.toLocaleString()}`;
+                document.getElementById('totalUsers').textContent = stats.totalUsers;
+
+                // Populate recent orders table
+                const recentOrdersTableBody = document.getElementById('recentOrdersTableBody');
+                recentOrdersTableBody.innerHTML = '';
+                if (stats.recentOrders && stats.recentOrders.length > 0) {
+                    stats.recentOrders.forEach(order => {
+                        const row = `<tr>
+                            <td>#${order.id}</td>
+                            <td>${order.username}</td>
+                            <td>${new Date(order.orderDate).toLocaleDateString()}</td>
+                            <td>₦${order.totalAmount.toLocaleString()}</td>
+                            <td><span class="status-badge status-${order.status.toLowerCase()}">${order.status}</span></td>
+                        </tr>`;
+                        recentOrdersTableBody.innerHTML += row;
+                    });
+                } else {
+                    recentOrdersTableBody.innerHTML = '<tr><td colspan="5">No recent orders found.</td></tr>';
+                }
+                
+                // Populate top selling items table
+                const topSellingTableBody = document.getElementById('topSellingTableBody');
+                topSellingTableBody.innerHTML = '';
+                if (stats.topSellingItems && stats.topSellingItems.length > 0) {
+                    stats.topSellingItems.forEach(item => {
+                        const row = `<tr>
+                            <td>${item.mealName}</td>
+                            <td>${item.totalQuantity}</td>
+                        </tr>`;
+                        topSellingTableBody.innerHTML += row;
+                    });
+                } else {
+                    topSellingTableBody.innerHTML = '<tr><td colspan="2">No sales data available.</td></tr>';
+                }
+
+            } catch (error) {
+                console.error('Error fetching dashboard stats:', error);
+            }
+        }
+
+        // Initial Load - Check which tab is active and load its data
+        const initialActiveTab = document.querySelector('.sidebar-nav li.active')?.dataset.tab;
+        if (initialActiveTab === 'dashboard') {
+            fetchDashboardStats();
+        } else if (initialActiveTab === 'order-management') {
+            fetchAndDisplayOrders();
+        } else if (initialActiveTab === 'menu-management') {
+            fetchAndDisplayMenu();
+        } else if (initialActiveTab === 'reports') {
+            fetchReportDetails();
+        }
+            
+        // --- Event Listeners for Filters/Buttons ---
+        statusFilter.addEventListener('change', filterAndRenderOrders);
+        refreshBtn.addEventListener('click', fetchAndDisplayOrders);
+
+        addMenuItemBtn.addEventListener('click', () => {
+            editingMealId = null;
+            menuItemForm.reset();
+            menuItemModal.querySelector('h2').textContent = 'Add New Menu Item';
+            menuItemModal.querySelector('button[type="submit"]').textContent = 'Add Item';
+            menuItemModal.style.display = 'flex';
+        });
+            
+        menuItemModal.querySelector('.close-modal').addEventListener('click', () => menuItemModal.style.display = 'none');
+        menuItemModal.querySelector('.cancel-modal').addEventListener('click', () => menuItemModal.style.display = 'none');
+            
+        menuItemForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const mealData = {
+                name: menuItemForm.querySelector('#itemName').value,
+                category: menuItemForm.querySelector('#itemCategory').value,
+                price: parseFloat(menuItemForm.querySelector('#itemPrice').value),
+                description: menuItemForm.querySelector('#itemDescription').value,
+                imageUrl: menuItemForm.querySelector('#itemImage').value,
+                available: menuItemForm.querySelector('#itemAvailable').checked
+            };
+            
+            const url = editingMealId ? `/api/menu/${editingMealId}` : '/api/menu';
+            const method = editingMealId ? 'PUT' : 'POST';
+            let token = sessionStorage.getItem('accessToken');
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify(mealData)
+                });
+                if (!response.ok) throw new Error('Failed to save menu item.');
+                
+                menuItemModal.style.display = 'none';
+                await fetchAndDisplayMenu();
+            } catch(error) {
+                console.error('Error saving menu item:', error);
+                alert('Could not save menu item.');
+            }
+        });
+
+        categoryFilters.forEach(filter => {
+            filter.addEventListener('click', (e) => {
+                categoryFilters.forEach(f => f.classList.remove('active'));
+                e.target.classList.add('active');
+                filterAndRenderMenu();
+            });
+        });
+    });
+    </script>
+</body>
+</html>

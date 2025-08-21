@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { margin: 5px; padding: 10px; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>API Test Page</h1>
+    
+    <div>
+        <h3>1. Test Login</h3>
+        <button onclick="testLogin()">Test Login</button>
+        <pre id="loginResult">Click the button to test login</pre>
+    </div>
+
+    <div>
+        <h3>2. Test Protected Endpoint</h3>
+        <button onclick="testProtected()">Test Protected Endpoint</button>
+        <pre id="protectedResult">Login first, then click to test protected endpoint</pre>
+    </div>
+
+    <script>
+        let token = '';
+
+        async function testLogin() {
+            try {
+                const response = await fetch('http://localhost:8082/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: 'user',
+                        password: 'user123'
+                    })
+                });
+
+                const result = await response.json();
+                token = result.token || 'No token received';
+                document.getElementById('loginResult').textContent = 
+                    `Status: ${response.status}\n` + 
+                    JSON.stringify(result, null, 2);
+            } catch (error) {
+                document.getElementById('loginResult').textContent = 
+                    `Error: ${error.message}\nCheck console for details`;
+                console.error('Login error:', error);
+            }
+        }
+
+        async function testProtected() {
+            if (!token) {
+                document.getElementById('protectedResult').textContent = 
+                    'Please login first to get a token';
+                return;
+            }
+
+            try {
+                // Replace with your actual protected endpoint
+                const response = await fetch('http://localhost:8082/api/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                document.getElementById('protectedResult').textContent = 
+                    `Status: ${response.status}\n` + 
+                    JSON.stringify(result, null, 2);
+            } catch (error) {
+                document.getElementById('protectedResult').textContent = 
+                    `Error: ${error.message}\nCheck console for details`;
+                console.error('Protected endpoint error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

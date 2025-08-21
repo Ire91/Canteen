@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Union Bank Canteen - Checkout</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="images/LOGO.jpeg" type="image/x-icon">
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!isLoggedIn()) {
+                window.location.href = 'login.html';
+            }
+        });
+        
+        function isLoggedIn() {
+            return sessionStorage.getItem('user') !== null;
+        }
+    </script>
+    <style>
+        /* Additional checkout-specific styles */
+        .checkout-section {
+            padding: 80px 0;
+            min-height: calc(100vh - 200px);
+        }
+        
+        .checkout-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .checkout-form h3,
+        .order-summary h3 {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .checkout-form .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .checkout-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .checkout-form input,
+        .checkout-form select,
+        .checkout-form textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+        
+        .checkout-form input:focus,
+        .checkout-form select:focus,
+        .checkout-form textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        @media (max-width: 576px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .payment-methods {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .payment-method {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .payment-method:hover {
+            border-color: var(--primary-color);
+        }
+        
+        .payment-method.active {
+            border-color: var(--primary-color);
+            background-color: rgba(0, 159, 227, 0.1);
+        }
+        
+        .payment-method i {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .order-summary {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+        
+        .order-items {
+            margin-bottom: 20px;
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .order-item-name {
+            display: flex;
+            align-items: center;
+        }
+        
+        .order-item-quantity {
+            background-color: var(--primary-color);
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 0.8rem;
+        }
+        
+        .order-totals {
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+        
+        .order-total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .order-total-row.final {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+        }
+        
+        .checkout-actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .checkout-actions button {
+            flex: 1;
+        }
+        
+        .back-to-cart {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        
+        .back-to-cart i {
+            margin-right: 8px;
+        }
+        
+        .success-message {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            display: none;
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background-color: var(--success-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+        }
+        
+        .success-message h2 {
+            margin-bottom: 15px;
+            color: var(--success-color);
+        }
+        
+        .success-message p {
+            margin-bottom: 30px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="images/LOGO.jpeg" alt="Union Bank Logo">
+                <h1>Union Bank Canteen</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html#menu" class="active">Meals</a></li>
+                    <li><a href="my-orders.html">Order History</a></li>
+                    <li>
+                        <button class="theme-toggle" id="themeToggle">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
+                    <li class="user-info-nav">
+                        <a href="#" class="user-profile" id="userProfileLink">
+                            <i class="fas fa-user-circle"></i>
+                            <span id="userNameDisplay">User</span>
+                        </a>
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="user-details">
+                                <div class="user-name" id="userFullName">User Name</div>
+                                <div class="user-role" id="userRole">Role</div>
+                                <div class="user-department" id="userDepartment">Department</div>
+                            </div>
+                            <div class="user-dropdown-links">
+                                <a href="profile.html" class="dropdown-link">
+                                    <i class="fas fa-user-cog"></i> My Profile
+                                </a>
+                                <a href="my-orders.html" class="dropdown-link">
+                                    <i class="fas fa-receipt"></i> My Orders
+                                </a>
+                                <a href="admin.html" class="dropdown-link admin-link" id="adminDashboardLink" style="display: none;">
+                                    <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                                </a>
+                            </div>
+                            <a href="#" id="logoutButton" class="logout-btn">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+                <div class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Checkout Section -->
+    <section class="checkout-section">
+        <div class="container">
+            <a href="index.html" class="back-to-cart">
+                <i class="fas fa-arrow-left"></i> Back to Menu
+            </a>
+            
+            <div class="section-header">
+                <h2>Checkout</h2>
+                <p>Complete your order</p>
+            </div>
+            
+            <div id="checkoutContent">
+                <div class="checkout-container">
+                    <div class="checkout-form">
+                        <h3>Delivery Information</h3>
+                        <form id="checkoutForm">
+                            <div class="form-group">
+                                <label for="name">Full Name</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="department">Department</label>
+                                <select id="department" name="department" required>
+                                    <option value="">Select Department</option>
+                                    <option value="IT">IT Department</option>
+                                    <option value="Finance">Finance Department</option>
+                                    <option value="HR">HR Department</option>
+                                    <option value="Operations">Operations Department</option>
+                                    <option value="Marketing">Marketing Department</option>
+                                    <option value="Customer Service">Customer Service</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="deliveryOption">Delivery Option</label>
+                                <select id="deliveryOption" name="deliveryOption" required>
+                                    <option value="pickup">Pickup at Canteen</option>
+                                    <option value="delivery">Delivery to Office</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" id="officeLocationGroup" style="display: none;">
+                                <label for="officeLocation">Office Location / Floor</label>
+                                <input type="text" id="officeLocation" name="officeLocation">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="deliveryTime">Preferred Delivery/Pickup Time</label>
+                                <input type="time" id="deliveryTime" name="deliveryTime" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="notes">Special Instructions</label>
+                                <textarea id="notes" name="notes" rows="3"></textarea>
+                            </div>
+                            
+                            <h3>Payment Method</h3>
+                            <div class="payment-methods">
+                                <div class="payment-method active" data-method="cash">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>Cash</span>
+                                </div>
+                                <div class="payment-method" data-method="transfer">
+                                    <i class="fas fa-university"></i>
+                                    <span>Bank Transfer</span>
+                                </div>
+                                <div class="payment-method" data-method="card">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>Card</span>
+                                </div>
+                            </div>
+                            
+                            <input type="hidden" id="paymentMethod" name="paymentMethod" value="cash">
+                            
+                            <div class="checkout-actions">
+                                <button type="button" id="cancelOrder" class="btn btn-secondary">Cancel Order</button>
+                                <button type="submit" id="placeOrder" class="btn btn-primary">Place Order</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="order-summary">
+                        <h3>Order Summary</h3>
+                        <div class="order-items" id="orderItems">
+                            <!-- Order items will be added dynamically -->
+                        </div>
+                        
+                        <div class="order-totals">
+                            <div class="order-total-row">
+                                <span>Subtotal</span>
+                                <span id="subtotal">₦0.00</span>
+                            </div>
+                            <div class="order-total-row">
+                                <span>Delivery Fee</span>
+                                <span id="deliveryFee">₦0.00</span>
+                            </div>
+                            <div class="order-total-row final">
+                                <span>Total</span>
+                                <span id="total">₦0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="successMessage" class="success-message">
+                <div class="success-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h2>Order Placed Successfully!</h2>
+                <p>Your order <strong id="orderNumber"></strong> has been received. Your feedback is important to us!</p>
+                <div class="checkout-actions" style="justify-content: center;">
+                    <a href="feedback.html" class="btn btn-secondary">Leave Feedback</a>
+                    <a href="index.html" class="btn btn-primary">Return to Menu</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="images/LOGO.jpeg" alt="Union Bank Logo">
+                    <h3>Union Bank Canteen</h3>
+                    <p>Serving delicious meals since 2010</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#menu">Menu</a></li>
+                        <li><a href="index.html#about">About</a></li>
+                        <li><a href="index.html#contact">Contact</a></li>
+                        <li><a href="login.html">Login</a></li>
+                    </ul>
+                </div>
+                <div class="footer-services">
+                    <h3>Our Services</h3>
+                    <ul>
+                        <li><a href="index.html#menu">Breakfast</a></li>
+                        <li><a href="index.html#menu">Lunch</a></li>
+                        <li><a href="index.html#menu">Dinner</a></li>
+                        <li><a href="index.html#contact">Catering</a></li>
+                    </ul>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>Subscribe to Our Newsletter</h3>
+                    <p>Get updates on our latest specials and events</p>
+                    <form id="newsletterForm" action="subscribe.php" method="POST">
+                        <div class="newsletter-input">
+                            <input type="email" placeholder="Your email address" required>
+                            <button type="submit"><i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="currentYear"></span> Union Bank Canteen. All rights reserved.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pre-fill user data
+            if (isLoggedIn()) {
+                const user = JSON.parse(sessionStorage.getItem('user'));
+                document.getElementById('name').value = user.name || '';
+                document.getElementById('email').value = user.email || (user.username + '@unionbankng.com');
+                document.getElementById('phone').value = user.phone || '';
+                document.getElementById('department').value = user.department || '';
+            }
+
+            // Initialize theme
+            initializeTheme();
+            
+            // Set current year in footer
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            
+            // Mobile menu toggle
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const body = document.body;
+            
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    body.classList.toggle('mobile-menu-open');
+                });
+            }
+            
+            // Check if user has items in cart
+            const cart = getCartItems();
+            if (cart.length === 0) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Delivery option toggle
+            const deliveryOption = document.getElementById('deliveryOption');
+            const officeLocationGroup = document.getElementById('officeLocationGroup');
+            const deliveryFeeElement = document.getElementById('deliveryFee');
+            const totalElement = document.getElementById('total');
+            
+            deliveryOption.addEventListener('change', function() {
+                if (this.value === 'delivery') {
+                    officeLocationGroup.style.display = 'block';
+                    deliveryFeeElement.textContent = '₦500.00';
+                    updateTotal();
+                } else {
+                    officeLocationGroup.style.display = 'none';
+                    deliveryFeeElement.textContent = '₦0.00';
+                    updateTotal();
+                }
+            });
+            
+            // Payment method selection
+            const paymentMethods = document.querySelectorAll('.payment-method');
+            const paymentMethodInput = document.getElementById('paymentMethod');
+            
+            paymentMethods.forEach(method => {
+                method.addEventListener('click', function() {
+                    // Remove active class from all methods
+                    paymentMethods.forEach(m => m.classList.remove('active'));
+                    
+                    // Add active class to clicked method
+                    this.classList.add('active');
+                    
+                    // Update hidden input value
+                    paymentMethodInput.value = this.getAttribute('data-method');
+                });
+            });
+            
+            // Display order items
+            displayOrderItems();
+            
+            // Form submission
+            const checkoutForm = document.getElementById('checkoutForm');
+            const checkoutContent = document.getElementById('checkoutContent');
+            const successMessage = document.getElementById('successMessage');
+            const orderNumber = document.getElementById('orderNumber');
+            
+            checkoutForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Get cart items and form data
+                const cartItems = getCartItems().map(item => ({
+                    mealId: item.id,
+                    mealName: item.name,
+                    quantity: item.quantity,
+                    price: item.price
+                }));
+
+                const orderRequest = {
+                    items: cartItems,
+                    deliveryOption: document.getElementById('deliveryOption').value,
+                    officeLocation: document.getElementById('officeLocation').value,
+                    notes: document.getElementById('notes').value,
+                    paymentMethod: document.getElementById('paymentMethod').value,
+                };
+
+                let token = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
+
+                try {
+                    const response = await fetch('/api/orders', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify(orderRequest)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to place order.');
+                    }
+
+                    const savedOrder = await response.json();
+                    document.getElementById('orderNumber').textContent = `Order #${savedOrder.id}`;
+                    
+                    // Show success message
+                    checkoutContent.style.display = 'none';
+                    successMessage.style.display = 'block';
+                    
+                    // Clear cart
+                    clearCartItems();
+
+                } catch (error) {
+                    console.error('Error placing order:', error);
+                    alert('There was a problem placing your order. Please try again.');
+                }
+            });
+            
+            // Cancel order
+            const cancelOrder = document.getElementById('cancelOrder');
+            
+            cancelOrder.addEventListener('click', function() {
+                if (confirm('Are you sure you want to cancel your order?')) {
+                    window.location.href = 'index.html';
+                }
+            });
+        });
+        
+        // Display order items
+        function displayOrderItems() {
+            const orderItems = document.getElementById('orderItems');
+            const subtotalElement = document.getElementById('subtotal');
+            const totalElement = document.getElementById('total');
+            const cart = getCartItems();
+            
+            orderItems.innerHTML = '';
+            
+            let subtotal = 0;
+            
+            cart.forEach(item => {
+                const orderItem = document.createElement('div');
+                orderItem.className = 'order-item';
+                
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                
+                orderItem.innerHTML = `
+                    <div class="order-item-name">
+                        <div class="order-item-quantity">${item.quantity}</div>
+                        <div>${item.name}</div>
+                    </div>
+                    <div class="order-item-price">₦${itemTotal.toLocaleString()}</div>
+                `;
+                
+                orderItems.appendChild(orderItem);
+            });
+            
+            subtotalElement.textContent = `₦${subtotal.toLocaleString()}.00`;
+            updateTotal();
+        }
+        
+        // Update total
+        function updateTotal() {
+            const subtotalElement = document.getElementById('subtotal');
+            const deliveryFeeElement = document.getElementById('deliveryFee');
+            const totalElement = document.getElementById('total');
+            
+            const subtotal = parseInt(subtotalElement.textContent.replace('₦', '').replace(',', ''));
+            const deliveryFee = parseInt(deliveryFeeElement.textContent.replace('₦', '').replace(',', ''));
+            
+            const total = subtotal + deliveryFee;
+            
+            totalElement.textContent = `₦${total.toLocaleString()}.00`;
+        }
+    </script>
+</body>
+</html>

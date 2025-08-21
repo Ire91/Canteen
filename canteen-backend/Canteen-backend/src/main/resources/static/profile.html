@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Union Bank Canteen Staff Portal - Account Settings">
+    <meta name="author" content="Union Bank IT Department">
+    <title>My Profile - Union Bank Canteen</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="images/LOGO.jpeg" type="image/x-icon">
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!isLoggedIn()) {
+                window.location.href = 'login.html';
+            }
+        });
+        
+        function isLoggedIn() {
+            return sessionStorage.getItem('user') !== null;
+        }
+    </script>
+    <style>
+        .profile-section {
+            padding: 80px 0;
+            min-height: calc(100vh - 200px);
+        }
+        
+        .profile-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 992px) {
+            .profile-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .profile-sidebar {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 3px 10px var(--shadow-color);
+            overflow: hidden;
+        }
+        
+        .profile-header {
+            padding: 25px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+        
+        .profile-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .profile-role {
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .profile-department {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .profile-nav {
+            padding: 15px 0;
+        }
+        
+        .profile-nav-item {
+            padding: 12px 25px;
+            display: flex;
+            align-items: center;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-nav-item:hover {
+            background-color: rgba(0, 159, 227, 0.08);
+            color: var(--primary-color);
+        }
+        
+        .profile-nav-item.active {
+            background-color: rgba(0, 159, 227, 0.12);
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .profile-nav-item i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .profile-content {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 3px 10px var(--shadow-color);
+            overflow: hidden;
+        }
+        
+        .profile-content-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .profile-content-header h3 {
+            font-size: 1.2rem;
+            margin: 0;
+        }
+        
+        .profile-content-body {
+            padding: 25px;
+        }
+        
+        .profile-form .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .profile-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .profile-form input,
+        .profile-form select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-form input:focus,
+        .profile-form select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 159, 227, 0.2);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+        }
+        
+        .profile-form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .profile-form-actions button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .preferences-list {
+            margin-top: 20px;
+        }
+        
+        .preference-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .preference-item:last-child {
+            border-bottom: none;
+        }
+        
+        .preference-info h4 {
+            margin: 0 0 5px;
+            font-size: 1rem;
+        }
+        
+        .preference-info p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* Toggle switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--primary-color);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .success-message {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 4px solid var(--success-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="images/LOGO.jpeg" alt="Union Bank Logo">
+                <h1>Union Bank Canteen</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#menu">Menu</a></li>
+                    <li><a href="index.html#about">About</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                    <li>
+                        <button class="theme-toggle" id="themeToggle">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
+                    <li class="user-info-nav">
+                        <a href="#" class="user-profile" id="userProfileLink">
+                            <i class="fas fa-user-circle"></i>
+                            <span id="userNameDisplay">User</span>
+                        </a>
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="user-details">
+                                <div class="user-name" id="userFullName">User Name</div>
+                                <div class="user-role" id="userRole">Role</div>
+                                <div class="user-department" id="userDepartment">Department</div>
+                            </div>
+                            <a href="#" id="logoutButton" class="logout-btn">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+                <div class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Profile Section -->
+    <section class="profile-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>My Account</h2>
+                <p>Manage your profile and preferences</p>
+            </div>
+            
+            <div class="profile-container">
+                <div class="profile-sidebar">
+                    <div class="profile-header">
+                        <div class="profile-avatar" id="profileAvatar">JD</div>
+                        <div class="profile-name" id="sidebarName">John Doe</div>
+                        <div class="profile-role" id="sidebarRole">Staff Member</div>
+                        <div class="profile-department" id="sidebarDepartment">Finance Department</div>
+                    </div>
+                    <div class="profile-nav">
+                        <div class="profile-nav-item active" data-tab="personal-info">
+                            <i class="fas fa-user"></i> Personal Information
+                        </div>
+                        <div class="profile-nav-item" data-tab="preferences">
+                            <i class="fas fa-cog"></i> Preferences
+                        </div>
+                        <div class="profile-nav-item" data-tab="security">
+                            <i class="fas fa-lock"></i> Security
+                        </div>
+                        <div class="profile-nav-item" data-tab="orders">
+                            <i class="fas fa-receipt"></i> Order History
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="profile-content">
+                    <!-- Personal Information Tab -->
+                    <div class="tab-content active" id="personal-info">
+                        <div class="profile-content-header">
+                            <h3>Personal Information</h3>
+                        </div>
+                        <div class="profile-content-body">
+                            <div class="success-message" id="personalInfoSuccess">
+                                Your personal information has been updated successfully!
+                            </div>
+                            <form class="profile-form" id="personalInfoForm">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="firstName">First Name</label>
+                                        <input type="text" id="firstName" name="firstName" value="John">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lastName">Last Name</label>
+                                        <input type="text" id="lastName" name="lastName" value="Doe">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email Address</label>
+                                    <input type="email" id="email" name="email" value="john.doe@unionbank.com">
+                                </div>
+                                <div class="form-group">
+                                    <label for="phone">Phone Number</label>
+                                    <input type="tel" id="phone" name="phone" value="08012345678">
+                                </div>
+                                <div class="form-group">
+                                    <label for="department">Department</label>
+                                    <select id="department" name="department">
+                                        <option value="IT">IT Department</option>
+                                        <option value="Finance" selected>Finance Department</option>
+                                        <option value="HR">HR Department</option>
+                                        <option value="Operations">Operations Department</option>
+                                        <option value="Marketing">Marketing Department</option>
+                                        <option value="Customer Service">Customer Service</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="staffId">Staff ID</label>
+                                    <input type="text" id="staffId" name="staffId" value="UB002" readonly>
+                                </div>
+                                <div class="profile-form-actions">
+                                    <button type="button" class="btn btn-secondary" id="resetPersonalInfo">
+                                        <i class="fas fa-undo"></i> Reset
+                                    </button>
+                                    <button type="submit" class="btn btn-primary" id="savePersonalInfo">
+                                        <i class="fas fa-save"></i> Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Preferences Tab -->
+                    <div class="tab-content" id="preferences">
+                        <div class="profile-content-header">
+                            <h3>Preferences</h3>
+                        </div>
+                        <div class="profile-content-body">
+                            <div class="success-message" id="preferencesSuccess">
+                                Your preferences have been updated successfully!
+                            </div>
+                            <p>Customize your canteen experience with these preferences.</p>
+                            
+                            <div class="preferences-list">
+                                <div class="preference-item">
+                                    <div class="preference-info">
+                                        <h4>Email Notifications</h4>
+                                        <p>Receive email notifications for order updates</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="emailNotifications" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="preference-item">
+                                    <div class="preference-info">
+                                        <h4>Order Confirmations</h4>
+                                        <p>Receive confirmation emails for new orders</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="orderConfirmations" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="preference-item">
+                                    <div class="preference-info">
+                                        <h4>Save Favorites</h4>
+                                        <p>Remember your favorite meals for quick ordering</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="saveFavorites" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="preference-item">
+                                    <div class="preference-info">
+                                        <h4>Special Offers</h4>
+                                        <p>Receive notifications about special offers and promotions</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="specialOffers">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="preference-item">
+                                    <div class="preference-info">
+                                        <h4>Default to Dark Mode</h4>
+                                        <p>Always use dark mode when you visit the canteen website</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="darkModeDefault">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="profile-form-actions">
+                                <button type="button" class="btn btn-secondary" id="resetPreferences">
+                                    <i class="fas fa-undo"></i> Reset
+                                </button>
+                                <button type="button" class="btn btn-primary" id="savePreferences">
+                                    <i class="fas fa-save"></i> Save Preferences
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Security Tab -->
+                    <div class="tab-content" id="security">
+                        <div class="profile-content-header">
+                            <h3>Security</h3>
+                        </div>
+                        <div class="profile-content-body">
+                            <div class="success-message" id="securitySuccess">
+                                Your password has been updated successfully!
+                            </div>
+                            <form class="profile-form" id="securityForm">
+                                <div class="form-group">
+                                    <label for="currentPassword">Current Password</label>
+                                    <input type="password" id="currentPassword" name="currentPassword" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newPassword">New Password</label>
+                                    <input type="password" id="newPassword" name="newPassword" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirmPassword">Confirm New Password</label>
+                                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                                </div>
+                                <div class="profile-form-actions">
+                                    <button type="button" class="btn btn-secondary" id="resetSecurity">
+                                        <i class="fas fa-undo"></i> Reset
+                                    </button>
+                                    <button type="submit" class="btn btn-primary" id="saveSecurity">
+                                        <i class="fas fa-save"></i> Update Password
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Orders Tab -->
+                    <div class="tab-content" id="orders">
+                        <div class="profile-content-header">
+                            <h3>Order History</h3>
+                        </div>
+                        <div class="profile-content-body">
+                            <p>View your recent orders and their status.</p>
+                            <a href="my-orders.html" class="btn btn-primary">
+                                <i class="fas fa-external-link-alt"></i> View All Orders
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="images/LOGO.jpeg" alt="Union Bank Logo">
+                    <h3>Union Bank Canteen</h3>
+                    <p>Serving delicious meals since 2010</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#menu">Menu</a></li>
+                        <li><a href="index.html#about">About</a></li>
+                        <li><a href="index.html#contact">Contact</a></li>
+                        <li><a href="my-orders.html">My Orders</a></li>
+                    </ul>
+                </div>
+                <div class="footer-services">
+                    <h3>Our Services</h3>
+                    <ul>
+                        <li><a href="index.html#menu">Breakfast</a></li>
+                        <li><a href="index.html#menu">Lunch</a></li>
+                        <li><a href="index.html#menu">Dinner</a></li>
+                        <li><a href="index.html#contact">Catering</a></li>
+                    </ul>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>Subscribe to Our Newsletter</h3>
+                    <p>Get updates on our latest specials and events</p>
+                    <form id="newsletterForm" action="subscribe.php" method="POST">
+                        <div class="newsletter-input">
+                            <input type="email" placeholder="Your email address" required>
+                            <button type="submit"><i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="currentYear"></span> Union Bank Canteen. All rights reserved.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize theme
+            initializeTheme();
+            
+            // Set current year in footer
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            
+            // Display user information
+            displayUserInfo();
+            updateProfileInfo();
+            
+            // Tab navigation
+            const navItems = document.querySelectorAll('.profile-nav-item');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all items
+                    navItems.forEach(navItem => navItem.classList.remove('active'));
+                    
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                    
+                    // Hide all tab contents
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Show selected tab content
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Form submissions
+            const personalInfoForm = document.getElementById('personalInfoForm');
+            const securityForm = document.getElementById('securityForm');
+            const savePreferencesBtn = document.getElementById('savePreferences');
+            
+            if (personalInfoForm) {
+                personalInfoForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const firstName = document.getElementById('firstName').value;
+                    const lastName = document.getElementById('lastName').value;
+                    const department = document.getElementById('department').value;
+                    const name = firstName + ' ' + lastName;
+
+                    // Prepare request body
+                    const updateData = {
+                        name: name,
+                        department: department
+                    };
+
+                    // Get access token from storage
+                    let accessToken = sessionStorage.getItem('accessToken');
+                    if (!accessToken) {
+                        accessToken = localStorage.getItem('accessToken');
+                    }
+
+                    // Send PUT request to backend
+                    try {
+                        const response = await fetch('http://localhost:8082/api/auth/me', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Bearer ' + accessToken
+                            },
+                            body: JSON.stringify(updateData)
+                        });
+                        if (!response.ok) {
+                            throw new Error('Failed to update profile');
+                        }
+                        const updatedUser = await response.json();
+                        // Update user info in session storage
+                        sessionStorage.setItem('user', JSON.stringify(updatedUser));
+                        // Also update in localStorage if present
+                        if (localStorage.getItem('user')) {
+                            localStorage.setItem('user', JSON.stringify(updatedUser));
+                        }
+                        // Show success message
+                    const successMessage = document.getElementById('personalInfoSuccess');
+                    successMessage.style.display = 'block';
+                        updateProfileInfo();
+                        displayUserInfo();
+                    setTimeout(function() {
+                        successMessage.style.display = 'none';
+                    }, 3000);
+                    } catch (err) {
+                        alert('Error updating profile: ' + err.message);
+                    }
+                });
+            }
+            
+            if (securityForm) {
+                securityForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const currentPassword = document.getElementById('currentPassword').value;
+                    const newPassword = document.getElementById('newPassword').value;
+                    const confirmPassword = document.getElementById('confirmPassword').value;
+                    
+                    // Basic validation
+                    if (!currentPassword || !newPassword || !confirmPassword) {
+                        alert('Please fill in all password fields');
+                        return;
+                    }
+                    
+                    if (newPassword !== confirmPassword) {
+                        alert('New password and confirmation do not match');
+                        return;
+                    }
+                    
+                    // In a real application, you would validate the current password and update it on the server
+                    // For now, we'll just show a success message
+                    const successMessage = document.getElementById('securitySuccess');
+                    successMessage.style.display = 'block';
+                    
+                    // Clear form
+                    securityForm.reset();
+                    
+                    // Hide success message after 3 seconds
+                    setTimeout(function() {
+                        successMessage.style.display = 'none';
+                    }, 3000);
+                });
+            }
+            
+            if (savePreferencesBtn) {
+                savePreferencesBtn.addEventListener('click', function() {
+                    // In a real application, you would send the preferences to the server
+                    // For now, we'll just show a success message
+                    const successMessage = document.getElementById('preferencesSuccess');
+                    successMessage.style.display = 'block';
+                    
+                    // Hide success message after 3 seconds
+                    setTimeout(function() {
+                        successMessage.style.display = 'none';
+                    }, 3000);
+                });
+            }
+            
+            // Reset buttons
+            const resetPersonalInfo = document.getElementById('resetPersonalInfo');
+            const resetPreferences = document.getElementById('resetPreferences');
+            const resetSecurity = document.getElementById('resetSecurity');
+            
+            if (resetPersonalInfo) {
+                resetPersonalInfo.addEventListener('click', function() {
+                    personalInfoForm.reset();
+                    updateProfileInfo();
+                });
+            }
+            
+            if (resetPreferences) {
+                resetPreferences.addEventListener('click', function() {
+                    document.getElementById('emailNotifications').checked = true;
+                    document.getElementById('orderConfirmations').checked = true;
+                    document.getElementById('saveFavorites').checked = true;
+                    document.getElementById('specialOffers').checked = false;
+                    document.getElementById('darkModeDefault').checked = false;
+                });
+            }
+            
+            if (resetSecurity) {
+                resetSecurity.addEventListener('click', function() {
+                    securityForm.reset();
+                });
+            }
+        });
+        
+        function updateProfileInfo() {
+            if (!isLoggedIn()) return;
+            
+            const user = JSON.parse(sessionStorage.getItem('user'));
+            
+            // Update profile sidebar
+            const profileAvatar = document.getElementById('profileAvatar');
+            const sidebarName = document.getElementById('sidebarName');
+            const sidebarRole = document.getElementById('sidebarRole');
+            const sidebarDepartment = document.getElementById('sidebarDepartment');
+            
+            if (profileAvatar) {
+                const initials = user.name.split(' ').map(n => n[0]).join('');
+                profileAvatar.textContent = initials;
+            }
+            
+            if (sidebarName) sidebarName.textContent = user.name;
+            if (sidebarRole) sidebarRole.textContent = user.role === 'admin' ? 'Administrator' : 'Staff Member';
+            if (sidebarDepartment) sidebarDepartment.textContent = user.department || 'Union Bank';
+            
+            // Update form fields
+            const firstName = document.getElementById('firstName');
+            const lastName = document.getElementById('lastName');
+            const email = document.getElementById('email');
+            const phone = document.getElementById('phone');
+            const department = document.getElementById('department');
+            const staffId = document.getElementById('staffId');
+            
+            if (firstName && lastName) {
+                const nameParts = user.name.split(' ');
+                if (nameParts.length > 1) {
+                    firstName.value = nameParts[0];
+                    lastName.value = nameParts.slice(1).join(' ');
+                } else {
+                    firstName.value = user.name;
+                    lastName.value = '';
+                }
+            }
+            
+            if (email) email.value = user.username + '@unionbank.com';
+            if (phone) phone.value = '0801234' + Math.floor(1000 + Math.random() * 9000);
+            if (department) department.value = user.department || 'Finance';
+            if (staffId) staffId.value = user.staffId || 'UB001';
+        }
+        
+        function updateUserInfo() {
+            if (!isLoggedIn()) return;
+            
+            const user = JSON.parse(sessionStorage.getItem('user'));
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const department = document.getElementById('department').value;
+            
+            user.name = firstName + ' ' + lastName;
+            user.department = department;
+            
+            sessionStorage.setItem('user', JSON.stringify(user));
+            
+            // Update profile display
+            updateProfileInfo();
+            displayUserInfo();
+        }
+    </script>
+</body>
+</html>
