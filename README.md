@@ -292,6 +292,4 @@ GitHub: [@Ire91](https://github.com/Ire91)
 
 LinkedIn: [Ireoluwa Balogun](https://www.linkedin.com/in/ireoluwa-balogun-7a7931321/)
 
-## 📄 License
 
-This project is licensed under the MIT License.
