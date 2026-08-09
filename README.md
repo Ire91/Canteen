@@ -4,6 +4,18 @@ A full-stack canteen management system built with **Java, Spring Boot, MySQL, JW
 
 The system provides secure user authentication, meal ordering, order management, role-based access control, menu management, user management, and administrative analytics.
 
+## 👨‍💻 What I Built
+
+This project demonstrates my hands-on experience building a full-stack business application, including:
+
+- Java/Spring Boot backend development
+- RESTful API design and implementation
+- JWT authentication and role-based authorization
+- MySQL database integration using Spring Data JPA
+- Frontend integration with HTML, CSS and JavaScript
+- API testing with Postman
+- Application packaging and deployment with Docker
+
 ## 🚀 Features
 
 ### User Features
