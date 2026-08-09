@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # 🍽️ Union Bank Canteen Backend
 
 Spring Boot RESTful API that allows Union Bank staff to log in, order meals, mark favorites, and enjoy account-based privileges (e.g., CEO priority access).
