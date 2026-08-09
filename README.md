@@ -149,14 +149,10 @@ Before running this project, ensure you have:
 The system comes with pre-configured users:
 
 ### Admin User
-- **Username**: `admin`
-- **Password**: `admin123`
 - **Role**: ADMIN
 - **Access**: Full system access
 
 ### Regular User
-- **Username**: `user`
-- **Password**: `user123`
 - **Role**: USER
 - **Access**: Order meals, view history, manage profile
 
@@ -407,7 +403,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👨‍💻 Author
 
-**Ireoluwa** - *Initial work* - [Your GitHub]
+**Ireoluwa** 
 
 ## 🙏 Acknowledgments
 
@@ -416,7 +412,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Font Awesome for icons
 - MySQL team for the database
 
----
 
-**Note**: This documentation is a living document. Please update it as the project evolves. 
->>>>>>> 34493af (First commit: add canteen site)
+ 
